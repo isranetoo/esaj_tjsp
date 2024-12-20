@@ -1,0 +1,100 @@
+URL_BASE = https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do
+
+vai ter que fazer sessao desse url: https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do
+captcha1: sajcaptcha_2b95f9ea1a014759ba21387ba4906d80
+captcha2: sajcaptcha_d44494d129ff44e5921111935bc5e572
+
+XPATH: //*[@id="divDadosResultado-A"]/table/tbody/tr[1]
+       //*[@id="divDadosResultado-A"]/table/tbody/tr[9]
+
+
+payload :
+conversationId: 
+dados.buscaInteiroTeor: cocaina
+dados.pesquisarComSinonimos: S
+dados.pesquisarComSinonimos: S
+dados.buscaEmenta: 
+dados.nuProcOrigem: 
+dados.nuRegistro: 
+agenteSelectedEntitiesList: 
+contadoragente: 0
+contadorMaioragente: 0
+codigoCr: 
+codigoTr: 
+nmAgente: 
+juizProlatorSelectedEntitiesList: 
+contadorjuizProlator: 0
+contadorMaiorjuizProlator: 0
+codigoJuizCr: 
+codigoJuizTr: 
+nmJuiz: 
+classesTreeSelection.values: 
+classesTreeSelection.text: 
+assuntosTreeSelection.values: 
+assuntosTreeSelection.text: 
+comarcaSelectedEntitiesList: 
+contadorcomarca: 0
+contadorMaiorcomarca: 0
+cdComarca: 
+nmComarca: 
+secoesTreeSelection.values: 
+secoesTreeSelection.text: 
+dados.dtJulgamentoInicio: 
+dados.dtJulgamentoFim: 
+dados.dtPublicacaoInicio: 
+dados.dtPublicacaoFim: 
+dados.origensSelecionadas: T
+tipoDecisaoSelecionados: A
+dados.ordenarPor: dtPublicacao
+
+
+
+ crie uma variavel para a resposta do link https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do
+
+# crie um programa em python que faca o request desses links e printa no termina suas resposta 
+
+URL_BASE = https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do , https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do
+
+
+faça com que o codigo mande esse payload para a pagina com isso:
+conversationId: 
+dados.buscaInteiroTeor: arroz
+dados.pesquisarComSinonimos: S
+dados.pesquisarComSinonimos: S
+dados.buscaEmenta: 
+dados.nuProcOrigem: 
+dados.nuRegistro: 
+agenteSelectedEntitiesList: 
+contadoragente: 0
+contadorMaioragente: 0
+codigoCr: 
+codigoTr: 
+nmAgente: 
+juizProlatorSelectedEntitiesList: 
+contadorjuizProlator: 0
+contadorMaiorjuizProlator: 0
+codigoJuizCr: 
+codigoJuizTr: 
+nmJuiz: 
+classesTreeSelection.values: 
+classesTreeSelection.text: 
+assuntosTreeSelection.values: 
+assuntosTreeSelection.text: 
+comarcaSelectedEntitiesList: 
+contadorcomarca: 0
+contadorMaiorcomarca: 0
+cdComarca: 
+nmComarca: 
+secoesTreeSelection.values: 
+secoesTreeSelection.text: 
+dados.dtJulgamentoInicio: 
+dados.dtJulgamentoFim: 
+dados.dtPublicacaoInicio: 
+dados.dtPublicacaoFim: 
+dados.origensSelecionadas: T
+tipoDecisaoSelecionados: A
+dados.ordenarPor: dtPublicacao
+recaptcha_response_token: 03AFcWeA757swfsekzjAtv5D-iFzimn6LZcf86gNUZNcg6Zz_4T-fq0MM3SOmIME6e-ao5OkAdz5iG94wpze1qwWH9Muor_7NUyXFJdkIOwLGN9Z-ChvpseNevi5ae0SDQ6a5M5Q36fEi_ukCelMkH6lm4nNSbe3TRJXBE8q4WbTOEY8Hra_vi0Bt2Ac8pLiAF0mhs3Hl5z5ECGOTG3Hi2HpsYPuHp56xVgpCjFS9TxsizRAPvjuqBf9y6wc4IpU4Zb6UX1cDJ8iDVvnfnUazxNw33qZR7EmjsgvElND5cONXS7yRSbYo5Tj4mZ37xckW3s2mv1swV4BYdr1EQeSKznyGLHhbKTl2DdCClg5mR9vq4gjeqzwACL9htuldGvSHbEoLhMwPe1lJnTmbQADY5h8mlLSQdCHDlncoFgAHc5LSXskWENVvSZTxydpY-UU91Vujx6sjVcCCMpyTuJrphbXfkbyxCrCjPyEDkA3rVSZG6lsQBJJccqKemUa5iccC9cy8d3AEmyJenEFeTckkuMgWBlDN1EkvC4MPbZ6tckZ8kvSMe2Ltvp8JIx1BaQzDiQJeOyTAsxsQroomijfaSOEEptDPiof2viqGmCnNSXWBTTWePXV5yAQ1lJNwwn9tmJyKYknJTjbc9a1dkPFmJk32OIYpd23jAOfzIUhy0c-MxHQMyGaY5J8YvKOsxS4s_mo18ZfDiFzRAt3ACylyJzu5BYeKVlsm3bAqtliXQR-VP1tqIKPCip5fO54SbdzwOWTHn0dSLmn_9ZY1ySjcRRYhI6Rz2SZYji2dHJlqxv2LwlObFyr_pozhcqBpsHZDvakbfgGFq52mOlXc8y5YE5HSyiOqlhhFmySkB-twJDvtCYJx-p2Fg8KOfzXNUJ-PZ5fWIfvyuefgQbZco0sejHzuL4xUU9I8aZA
+uuidCaptcha: sajcaptcha_82a0264699c44c6a9def5a9c5c0be94d
+
+e o uuidCaptcha é a response_captcha.text
