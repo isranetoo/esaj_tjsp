@@ -1,27 +1,21 @@
 import requests
 
+URL_BASE = "https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do"
+
+
 def fetch_urls():
-    urls = [
-        "https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do",
-        "https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do"
-    ]
+    response_captcha = None 
+    try:
+        response = requests.get(URL_BASE)
 
-    response_captcha = None  # Variable for the captcha response
-    
-    for url in urls:
-        try:
-            response = requests.get(url)
-
-            if url == "https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do":
-                response_captcha = response  # Store the response for the captcha URL
-
-            print(f"URL: {url}\nStatus Code: {response.status_code}\n")
-            print("Response Content:")
-            print(response.text[:500])  # Print only the first 500 characters for readability
-            print("-" * 80)
-        except requests.exceptions.RequestException as e:
-            print(f"An error occurred while fetching {url}: {e}\n")
-
+        if URL_BASE == "https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do":
+            response_captcha = response  
+        print(f"URL: {URL_BASE}\nStatus Code: {response.status_code}\n")
+        print("Response Content:")
+        print(response.text[:500])
+        print("-" * 80)
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred while fetching {URL_BASE}: {e}\n")
     return response_captcha
 
 def send_payload(response_captcha):
