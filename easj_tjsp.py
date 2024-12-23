@@ -1,32 +1,44 @@
 import requests
+import json
 
 URL_BASE = "https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do"
+URL_PAYLOAD = "https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do"
 
-
-def fetch_urls():
-    response_captcha = None 
+def fetch_uuid_captcha():
+    """  """
     try:
         response = requests.get(URL_BASE)
+        response.raise_for_status()
+        print(f"URL_BASE status code {response.status_code}")
 
-        if URL_BASE == "https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do":
-            response_captcha = response  
-        print(f"URL: {URL_BASE}\nStatus Code: {response.status_code}\n")
-        print("Response Content:")
-        print(response.text[:500])
-        print("-" * 80)
+        if "sajcaptcha_" in response.text:
+            start_index = response.text.find("sajcaptcha_")
+            end_index = response.text.find('"', start_index)
+            uuid_captcha = response.text[start_index:end_index]
+        else:
+            raise ValueError("uuidCaptcha not found in the response")
+        
+        with open("uuid_captcha.json", 'w', encoding='utf-8') as json_file:
+            json.dump({"uuidCaptcha": uuid_captcha}, json_file, ensure_ascii=False, indent=4)
+
+        print(f"uuidCaptcha extracted and saved: {uuid_captcha}")
+        return uuid_captcha
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred while fetching {URL_BASE}: {e}\n")
-    return response_captcha
+        print(f"An error ocurred while fetchig URL_BASE: {e}")
+    except ValueError as ve:
+        print(ve)
+    return None
+    
 
-def send_payload(response_captcha):
-    if response_captcha is None:
-        print("Captcha response is missing. Cannot proceed with payload.")
+def send_payload(uuid_captcha):
+    """  """
+    if not uuid_captcha:
+        print("uuidCaptcha is missing, Cannot proceed with payload.")
         return
-
-    url = "https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do"
+    
     payload = {
         "conversationId": "",
-        "dados.buscaInteiroTeor": "arroz",
+        "dados.buscaInteiroTeor": "itau",
         "dados.pesquisarComSinonimos": "S",
         "dados.buscaEmenta": "",
         "dados.nuProcOrigem": "",
@@ -61,19 +73,29 @@ def send_payload(response_captcha):
         "dados.origensSelecionadas": "T",
         "tipoDecisaoSelecionados": "A",
         "dados.ordenarPor": "dtPublicacao",
-        "recaptcha_response_token": "03AFcWeA757swfsekzjAtv5D-iFzimn6LZcf86gNUZNcg6Zz_4T-fq0MM3SOmIME6e-ao5OkAdz5iG94wpze1qwWH9Muor_7NUyXFJdkIOwLGN9Z-ChvpseNevi5ae0SDQ6a5M5Q36fEi_ukCelMkH6lm4nNSbe3TRJXBE8q4WbTOEY8Hra_vi0Bt2Ac8pLiAF0mhs3Hl5z5ECGOTG3Hi2HpsYPuHp56xVgpCjFS9TxsizRAPvjuqBf9y6wc4IpU4Zb6UX1cDJ8iDVvnfnUazxNw33qZR7EmjsgvElND5cONXS7yRSbYo5Tj4mZ37xckW3s2mv1swV4BYdr1EQeSKznyGLHhbKTl2DdCClg5mR9vq4gjeqzwACL9htuldGvSHbEoLhMwPe1lJnTmbQADY5h8mlLSQdCHDlncoFgAHc5LSXskWENVvSZTxydpY-UU91Vujx6sjVcCCMpyTuJrphbXfkbyxCrCjPyEDkA3rVSZG6lsQBJJccqKemUa5iccC9cy8d3AEmyJenEFeTckkuMgWBlDN1EkvC4MPbZ6tckZ8kvSMe2Ltvp8JIx1BaQzDiQJeOyTAsxsQroomijfaSOEEptDPiof2viqGmCnNSXWBTTWePXV5yAQ1lJNwwn9tmJyKYknJTjbc9a1dkPFmJk32OIYpd23jAOfzIUhy0c-MxHQMyGaY5J8YvKOsxS4s_mo18ZfDiFzRAt3ACylyJzu5BYeKVlsm3bAqtliXQR-VP1tqIKPCip5fO54SbdzwOWTHn0dSLmn_9ZY1ySjcRRYhI6Rz2SZYji2dHJlqxv2LwlObFyr_pozhcqBpsHZDvakbfgGFq52mOlXc8y5YE5HSyiOqlhhFmySkB-twJDvtCYJx-p2Fg8KOfzXNUJ-PZ5fWIfvyuefgQbZco0sejHzuL4xUU9I8aZA",
-        "uuidCaptcha": response_captcha.text
+        "recaptcha_response_token": "03AFcWeA61b-PznGxZm0PPnrArU-pHVBbUcv9qHMbsGdC0rqxhBTgl0t12arNHLFwSayOzDRNgm0hYBi2wmNja9kTRX59r6X_FB8GwaM7_106dFsIu5kKIaGpmsg65nvzfkj4JfK3YsGijNmdx6AcJyZZ4TMsDjrMJv5L9HkkKQ4NAnHHpiMHp8Q47ALxx9qftFV6vqyIe0irqkDvnpLne61X4YYrK3mlwIbFFUQj3_4s0oZ8bbY8unYhFEWlNCCO0S6v_mljQgjfdsN-rvrxtZIlkYptI3tpZpDHgO2n21oC1OCcM9rjxVXJ-m88W2nxuuokcxc275gveK1l3bTiIOqwExiYXyktAYklsQ0BSM0vfc8pby3UKPphRIW-7SrXOAvJJwNTuGTOIw4oUbuK8OfY_r8Qfd7B_R20HFtn6eNzL9Sd38wkuDqn8lCkqwLJDmDazwLz6ev_cAW3HuSjtwL4fAAhfcKN2fi07dh7XkwSocrdC8F3KmgNKmnEg8gNNBulSJqIKm3GclWBNRXjxzrhO8iq1uavPpvvICuCCJ1vwwQS9RujIcs97QWULkp2qInTHH0MvBNTign1c-lVoO3C_xdBPnZK_VYrkbK1Hbo3BhzzRWSVGZKpelAwruBlRvRUJSqYbh1AVbQUCIxJ_qhbfNU0LvwsAyBxq8MbLHAslYJF_mYBJouXCY5zFL8BUc0z3AM3rxtks2BWq6tbNYWKwY739bOLxlmwB8q_0-7M0GgQnBQZ6zJJBA0QA7w6URRfnvge9vCcYHsX3GDtNP3_VQqIWypTYMNJU_LqgflaU2yay67lg-JR-uI18HudLfh8SgtOm_Xt6rV9eHFhsnqKWizjDrxuyDMl72DAivzIAb5f4SvpwDiZLYrQ70_LyV3MnUUDdjiM52sZ9grPetBUq-3_QOeeFpQkF11pX7fhyAlJBSvgwPgI",
+        "uuidCaptcha": uuid_captcha
     }
+    try: 
+        response = requests.post(URL_PAYLOAD, data=payload)
+        response.raise_for_status()
 
-    try:
-        response = requests.post(url, data=payload)
-        print("Payload Sent. Response Status Code:", response.status_code)
-        print("Response Content:")
-        print(response.text[:500])
+        content_type = response.headers.get('Content-Type', '')
+        if 'application/json' in content_type:
+            response_data = response.json()
+            with open ("response.json", 'w', encoding='utf-8') as json_file:
+                json.dump(response_data, json_file, ensure_ascii=False, indent=4)
+            print("Response saved to 'response.json'")
+        else:
+            with open("response_raw_html.html", 'w', encoding='utf-8') as html_file:
+                html_file.write(response.text)
+            print("Raw response saved to 'response_raw.html'")
     except requests.exceptions.RequestException as e:
-        print("An error occurred while sending the payload:", e)
+        print(f"An error ocurred while sending the payload: {e}")
+    except ValueError as ve:
+        print(f"Error while processing the resonse: {ve}")
 
-if __name__ == "__main__":
-    response_captcha = fetch_urls()
-    if response_captcha:
-        send_payload(response_captcha)
+if __name__ == '__main__':
+    uuid_captcha = fetch_uuid_captcha()
+    if uuid_captcha:
+        send_payload(uuid_captcha)
