@@ -2,11 +2,11 @@
     {
         "numero": "0000886-40.2024.5.21.0004",
         "valorDaCausa": 843631.57,
-       - "area_code": "5",
-       - "tribunal_code": "21",
-       - "vara_code": "0004",
-       - "area": "Trabalhista",
-       - "tribunal": "TRT-21",
+        "area_code": "5",
+        "tribunal_code": "21",
+        "vara_code": "0004",
+        "area": "Trabalhista",
+        "tribunal": "TRT-21",
         "instancias": [
             {
                 "fonte_script": "Scrapper",

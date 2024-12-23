@@ -6,8 +6,6 @@ Data do julgamento: 21/12/2024
 Data de publicação: 21/12/2024
 Ementa: RELAÇÃO DE CONSUMO. FRAUDE. CULPA EXCLUSIVA DA VÍTIMA. OMISSÃO. CONTRADIÇÃO. INOCORRÊNCIA. I. CASO EM EXAME. 1. O recurso. Embargos de declaração em face da decisão colegiada que, por unanimidade, negou provimento ao recurso da autora. II. QUESTÕES EM DISCUSSÃO: 2. A questão em discussão consiste em saber se há obscuridade, contradição ou omissão que justifique o acolhimento dos
 
-2347139-98.2024.8.26.0000
-
 [
     {
         "numero": "2347139-98.2024.8.26.0000",
