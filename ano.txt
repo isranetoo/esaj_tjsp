@@ -1,2 +1,0 @@
-agora faça que entre em https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do coloque no input //*[@id="iddados.buscaInteiroTeor"] "itau" e em seguida colete as infos de
-//*[@id="divDadosResultado-A"]/table/tbody/tr[1] quando aparecer
