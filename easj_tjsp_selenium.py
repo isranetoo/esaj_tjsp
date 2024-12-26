@@ -1,10 +1,30 @@
 import json
 import time
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
+
+def get_uuidCaptcha_from_payload():
+    """
+    Realiza uma requisição POST para obter o valor do uuidCaptcha necessário para continuar o processo.
+    """
+    url = "https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do"
+     
+    response = requests.post(url)
+    
+    if response.status_code == 200:
+        print("Resposta do servidor:", response.text)
+        if 'uuidCaptcha' in response.text:
+            print("uuidCaptcha encontrado:", response.text.split('uuidCaptcha":')[1].split('"')[1])
+        else:
+            print("uuidCaptcha não encontrado na resposta.")
+    else:
+        print(f"Erro ao enviar a requisição: {response.status_code}")
+        return None
+    
 
 def search_and_collect(driver):
     """
@@ -222,6 +242,8 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(chrome_options)  
 
     try:
+        get_uuidCaptcha_from_payload()
+
         search_and_collect(driver)
     finally:
         driver.quit()
