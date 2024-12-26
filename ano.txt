@@ -1,0 +1,2 @@
+crie uma funcao onde mude a numeracao da pagina https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina=1&conversationId= e fazendo o a coleta de dados 
+mude somente o numero https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina=2&conversationId=: 

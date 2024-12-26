@@ -1,9 +1,9 @@
 import json
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-import time
-import datetime
+from selenium.webdriver.chrome.options import Options
 
 
 def search_and_collect(driver):
@@ -24,7 +24,7 @@ def search_and_collect(driver):
         time.sleep(5)
 
         i = 1
-        while i <= 10:
+        while i <= 20:
             result_xpath = f'//*[@id="divDadosResultado-A"]/table/tbody/tr[{i}]'
             
             try:
@@ -38,6 +38,10 @@ def search_and_collect(driver):
                     "vara_code": None,
                     "area": None,
                     "tribunal": "TJ-SP",
+                    "comarca": remove_prefix(
+                            extract_text(result_element, f'//*[@id="divDadosResultado-A"]/table/tbody/tr[{i}]/td[2]/table/tbody/tr[4]/td'), 
+                            "Comarca: "
+                        ),
                     "instancias": [{
                         "fonte_script": "Scrapper",
                         "fonte_sistema": "TJ-SP",
@@ -62,66 +66,69 @@ def search_and_collect(driver):
 
                         "first_mov": None,
                         "last_mov": remove_prefix(extract_text(result_element, f'//*[@id="divDadosResultado-A"]/table/tbody/tr[2]/td[2]/table/tbody/tr[7]/td'),
-                            "Data de publicação:"
+                            "Data de publicação: "
                         ),
                          "envolvidos": [
                     {
-                        "nome": "J. M. R. I.",
+                        "nome": None,
                         "tipo": "RECLAMANTE",
                         "polo": "ATIVO",
-                        "id_sistema": {"login": "03411657430"},
+                        "id_sistema": {"login": None},
                         "documento": [],
                         "endereco": {},
                         "representantes": [
                             {
-                                "nome": "RENE GOMES DA VEIGA PESSOA JUNIOR",
+                                "nome": None,
                                 "tipo": "ADVOGADO",
                                 "polo": "ATIVO",
-                                "id_sistema": {"login": "03867168466"},
-                                "documento": [{"CPF": "038.671.684-66"}],
+                                "id_sistema": {"login": None},
+                                "documento": [{"CPF": None}],
                                 "endereco": {
-                                    "logradouro": "CARACOL",
-                                    "numero": "00",
-                                    "complemento": "BL 02 AP 302",
-                                    "bairro": "CANDEIAS",
-                                    "municipio": "JABOATAO DOS GUARARAPES",
-                                    "estado": "PE",
-                                    "cep": "54430-180"
+                                    "logradouro": None,
+                                    "numero": None,
+                                    "complemento": None,
+                                    "bairro": None,
+                                    "municipio": None,
+                                    "estado": None,
+                                    "cep": None,
                                 }
                             }
                         ]
                     },
                     {
-                        "nome": "I. U. S. A.",
+                        "nome": None,
                         "tipo": "RECLAMADO",
                         "polo": "PASSIVO",
-                        "id_sistema": {"login": "60701190000104"},
+                        "id_sistema": {"login": None},
                         "documento": [],
                         "endereco": {},
                         "representantes": [
                             {
-                                "nome": "GUSTAVO GERBASI GOMES DIAS",
+                                "nome": None,
                                 "tipo": "ADVOGADO",
                                 "polo": "PASSIVO",
-                                "id_sistema": {"login": "00715149539"},
-                                "documento": [{"CPF": "007.151.495-39"}],
+                                "id_sistema": {"login": None},
+                                "documento": [{"CPF": None}],
                                 "endereco": {
-                                    "logradouro": "MONTE CONSELHO",
-                                    "numero": "690",
-                                    "complemento": "AP 402",
-                                    "bairro": "RIO VERMELHO",
-                                    "municipio": "SALVADOR",
-                                    "estado": "BA",
-                                    "cep": "41940-370"
+                                    "logradouro": None,
+                                    "numero": None,
+                                    "complemento": None,
+                                    "bairro": None,
+                                    "municipio": None,
+                                    "estado": None,
+                                    "cep": None
                                 }
                             }
                         ]
                     },
                     {
-                        "nome": "null",
+                        "nome": remove_prefix(
+                            extract_text(result_element, f'//*[@id="divDadosResultado-A"]/table/tbody/tr[{i}]/td[2]/table/tbody/tr[3]/td'), 
+                            "Relator(a): "
+                        ),
                         "tipo": "RELATOR(A)",
                         "polo": "OUTROS",
-                        "id_sistema": {"login": "01436709482"},
+                        "id_sistema": {"login": None},
                         "documento": [],
                         "endereco": {},
                         "representantes": []
@@ -130,37 +137,40 @@ def search_and_collect(driver):
 
                 "movimentacoes": [
                     {
-                        "titulo": "Publicado(a) o(a) intima\u00e7\u00e3o em 19/11/2024",
+                        "titulo": "Data de publicação",
                         "tipoConteudo": "HTML",
-                        "data": "2024-11-18T01:55:35.152311",
-                        "ativo": "true",
-                        "documento": "false",
-                        "mostrarHeaderData": "true",
-                        "usuarioCriador": 0
+                        "data": remove_prefix(extract_text(result_element, f'//*[@id="divDadosResultado-A"]/table/tbody/tr[2]/td[2]/table/tbody/tr[7]/td'),
+                            "Data de publicação: "
+                        ),
+                        "ativo": None,
+                        "documento":None,
+                        "mostrarHeaderData": None,
+                        "usuarioCriador": None
                     },
                     {
-                        "titulo": "Juntada a peti\u00e7\u00e3o de Manifesta\u00e7\u00e3o",
-                        "tipoConteudo": "HTML",
-                        "data": "2024-10-28T07:34:04.718311",
-                        "ativo": "true",
-                        "documento": "false",
-                        "usuarioCriador": "00715149539"
+                        "titulo": None,
+                        "tipoConteudo": None,
+                        "data": None,
+                        "ativo": None,
+                        "documento": None,
+                        "usuarioCriador": None
                     },
                     {
-                        "id": 21053674,
-                        "idUnicoDocumento": "9f8f421",
-                        "titulo": "Ata da Audi\u00eancia",
-                        "tipo": "Ata da Audi\u00eancia",
+                        "id": None,
+                        "idUnicoDocumento": None,
+                        "titulo": "Ata da Audieancia",
+                        "tipo": "Ata da Audieancia",
                         "tipoConteudo": "PDF",
-                        "data": "2024-10-28T09:57:00.928087",
-                        "ativo": "true",
-                        "documentoSigiloso": "false",
-                        "usuarioPerito": "false",
-                        "documento": "true",
-                        "publico": "true",
-                        "usuarioJuntada": "LUIZA EUGENIA PEREIRA ARRAES",
-                        "usuarioCriador": 0,
-                        "instancia": "1"
+                        "data": remove_prefix(extract_text(result_element, f'//*[@id="divDadosResultado-A"]/table/tbody/tr[2]/td[2]/table/tbody/tr[7]/td'),
+                            "Data de publicação: "
+                        ),
+                        "ativo": None,
+                        "documentoSigiloso": None,
+                        "usuarioPerito": None,
+                        "publico": None,
+                        "usuarioJuntada": None,
+                        "usuarioCriador": None,
+                        "instancia": None
                     }
                 ]
             }
@@ -193,7 +203,7 @@ def extract_text(parent_element, relative_xpath):
         return element.text.strip()
     except Exception:
         return None
-    
+  
 
 def remove_prefix(text, prefix):
     """Remove o prefixo especificado do texto, se presente."""
@@ -203,7 +213,13 @@ def remove_prefix(text, prefix):
 
 
 if __name__ == "__main__":
-    driver = webdriver.Chrome()  
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+
+    driver = webdriver.Chrome(chrome_options)  
 
     try:
         search_and_collect(driver)
