@@ -1,9 +1,1 @@
-crie uma funcao onde mude a numeracao da pagina https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina=1&conversationId= e fazendo o a coleta de dados 
-mude somente o numero https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina=2&conversationId=: 
-
-faça com que colete primeiro os 20 itens e depois faca o request https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina=2&conversationId= e coletando o restante
-
-
-crie uma funcao onde colete o uuidCaptcha exemplo uuidCaptcha: sajcaptcha_adfa07f59bef4de5ade20611769a60aa que esta localizado em payload de request deste link https://esaj.tjsp.jus.br/cjsg/captchaControleAcesso.do
-
-agora faça com que colete o novo "uuidCaptcha": e mostre no terminal
+crie uma funcao onde colete as informações da sessao, possibilitando utilizala depois:
