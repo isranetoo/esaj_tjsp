@@ -1,14 +1,11 @@
 import json
-import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
 
 def save_session_data(driver, session_file="session_data.json"):
-    """
-    Salva os dados da sessão, como cookies e local storage, para reutilização futura.
-    """
+    """Salva os dados da sessão (cookies e local storage)"""
     try:
         cookies = driver.get_cookies()
         local_storage = driver.execute_script("return window.localStorage;")
@@ -22,15 +19,14 @@ def save_session_data(driver, session_file="session_data.json"):
     except Exception as e:
         print(f"Erro ao salvar os dados da sessão: {e}")
 
+
 def load_session_data(driver, session_file="session_data.json"):
-    """
-    Carrega os dados da sessão a partir de um arquivo JSON e aplica ao navegador.
-    """
+    """Carrega os dados da sessão (cookies e local storage)"""
     try:
         with open(session_file, "r", encoding="utf-8") as file:
             session_data = json.load(file)
 
-        driver.get("https://esaj.tjsp.jus.br")  
+        driver.get("https://esaj.tjsp.jus.br")
 
         for cookie in session_data.get("cookies", []):
             driver.add_cookie(cookie)
@@ -44,10 +40,9 @@ def load_session_data(driver, session_file="session_data.json"):
     except Exception as e:
         print(f"Erro ao carregar os dados da sessão: {e}")
 
+
 def extract_case_data(driver):
-    """
-    Coleta os dados da tabela na página e salva em um arquivo JSON.
-    """
+    """Coleta os dados da página de processos"""
     results = []
     rows_xpath = "//body/table[1]/tbody/tr"
 
@@ -202,16 +197,14 @@ def extract_case_data(driver):
             except Exception as e:
                 print(f"Erro ao coletar dados da linha {i}: {e}")
 
-        with open("processos.json", "w", encoding="utf-8") as file:
-            json.dump(results, file, ensure_ascii=False, indent=4)
-
-        print("Dados dos processos salvos no arquivo 'processos.json'.")
+        return results
     except Exception as e:
         print(f"Erro ao coletar dados da tabela: {e}")
+        return []
 
 
 def remove_prefix(text, prefix):
-    """Remove o prefixo especificado do texto, se presente."""
+    """Remove o prefixo especificado do texto, se presente"""
     if text and text.startswith(prefix):
         return text.replace(prefix, "").strip()
     return text
@@ -229,11 +222,25 @@ if __name__ == "__main__":
     try:
         load_session_data(driver)
 
-        url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina=1&conversationId="
-        driver.get(url)
+        all_case_data = []  
+        base_url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina={}&conversationId="
+     
+        page = 1
+        while page <= 5:
+            print(f"Acessando página {page}")
+            driver.get(base_url.format(page))
 
-        extract_case_data(driver)
+            
+            case_data = extract_case_data(driver)
+            all_case_data.extend(case_data)
 
+            page += 1  
+
+        with open("processos.json", "w", encoding="utf-8") as file:
+            json.dump(all_case_data, file, ensure_ascii=False, indent=4)
+
+        print("Dados de todos os processos salvos no arquivo 'processos.json'.")
         save_session_data(driver)
+
     finally:
         driver.quit()
