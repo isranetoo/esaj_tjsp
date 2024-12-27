@@ -1,2 +1,167 @@
-escreva o codigo inteiro e atualizado com as mudanças novas
+case_data = {                             
+                    "numero":  row.find_element(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a[1]").text,
+                    "valorDaCausa": None,
+                    "area_code": None,
+                    "tribunal_code": None,
+                    "vara_code": None,
+                    "area": None,
+                    "tribunal": "TJ-SP",
+                    "comarca":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[4]/td").text,
+                            "Comarca: "      
+                        ),
+                    "instancias": [{
+                        "fonte_script": "Scrapper",
+                        "fonte_sistema": "TJ-SP",
+                        "fonte_tipo": "TRIBUNAL",
+                        "fonte_url": "https://esaj.tjsp.jus.br/",
 
+                        "grau": None,
+                        "classe": None,
+                        "orgaoJulgador": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[5]/td").text,
+                          "Órgão julgador: "             
+                        ),
+
+                        "segredoJustica": None,
+                        "justicaGratuita": None,
+
+                        "assunto_principal": None,
+                        "assuntos": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[2]/td").text, 
+                            "Classe/Assunto: "
+                        ),
+
+                        "first_mov": None,
+                        "last_mov": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,
+                          "Data de publicação: "              
+                        ),
+                         "envolvidos": [
+                    {
+                        "nome": None,
+                        "tipo": "RECLAMANTE",
+                        "polo": "ATIVO",
+                        "id_sistema": {"login": None},
+                        "documento": [],
+                        "endereco": {},
+                        "representantes": [
+                            {
+                                "nome": None,
+                                "tipo": "ADVOGADO",
+                                "polo": "ATIVO",
+                                "id_sistema": {"login": None},
+                                "documento": [{"CPF": None}],
+                                "endereco": {
+                                    "logradouro": None,
+                                    "numero": None,
+                                    "complemento": None,
+                                    "bairro": None,
+                                    "municipio": None,
+                                    "estado": None,
+                                    "cep": None,
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "nome": None,
+                        "tipo": "RECLAMADO",
+                        "polo": "PASSIVO",
+                        "id_sistema": {"login": None},
+                        "documento": [],
+                        "endereco": {},
+                        "representantes": [
+                            {
+                                "nome": None,
+                                "tipo": "ADVOGADO",
+                                "polo": "PASSIVO",
+                                "id_sistema": {"login": None},
+                                "documento": [{"CPF": None}],
+                                "endereco": {
+                                    "logradouro": None,
+                                    "numero": None,
+                                    "complemento": None,
+                                    "bairro": None,
+                                    "municipio": None,
+                                    "estado": None,
+                                    "cep": None
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "nome":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[3]/td").text,
+                            "Relator(a): "
+                        ),
+                        "tipo": "RELATOR(A)",
+                        "polo": "OUTROS",
+                        "id_sistema": {"login": None},
+                        "documento": [],
+                        "endereco": {},
+                        "representantes": []
+                    }
+                ],
+
+                "movimentacoes": [
+                    {
+                        "titulo": "Data de publicação",
+                        "tipoConteudo": "HTML",
+                        "data":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,
+                          "Data de publicação: "              
+                        ),
+                        "ativo": None,
+                        "documento":None,
+                        "mostrarHeaderData": None,
+                        "usuarioCriador": None
+                    },
+                    {
+                        "titulo": None,
+                        "tipoConteudo": None,
+                        "data": None,
+                        "ativo": None,
+                        "documento": None,
+                        "usuarioCriador": None
+                    },
+                    {
+                        "id": None,
+                        "idUnicoDocumento": None,
+                        "titulo": "Ata da Audieancia",
+                        "tipo": "Ata da Audieancia",
+                        "tipoConteudo": "PDF",
+                        "data":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,
+                          "Data de publicação: "              
+                        ),
+                        "ativo": None,
+                        "documentoSigiloso": None,
+                        "usuarioPerito": None,
+                        "publico": None,
+                        "usuarioJuntada": None,
+                        "usuarioCriador": None,
+                        "instancia": None
+                    }
+                ]
+            }
+        ]
+    }
+
+
+                    "numero_processo": row.find_element(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a[1]").text,
+                    "classe_assunto": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[2]/td").text, 
+                            "Classe/Assunto: "
+                        ),
+                    "relator": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[3]/td").text,
+                            "Relator(a): "
+                        ),
+                    "comarca": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[4]/td").text,
+                            "Comarca: "      
+                        ),
+                    "orgao_julgador": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[5]/td").text,
+                          "Órgão julgador: "             
+                        ),
+                    "data_julgamento": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[6]/td").text,
+                          "Data do julgamento: "              
+                        ),
+                    "data_publicacao": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,
+                          "Data de publicação: "              
+                        ),
+                    "ementa": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[8]/td").text,
+                          "Ementa:"     
+                        ),
+                }

@@ -1,0 +1,80 @@
+{
+    "cookies": [
+        {
+            "domain": ".esaj.tjsp.jus.br",
+            "expiry": 1735310865,
+            "httpOnly": false,
+            "name": "__utmb",
+            "path": "/",
+            "sameSite": "Lax",
+            "secure": true,
+            "value": "173948983.2.10.1735309061"
+        },
+        {
+            "domain": ".esaj.tjsp.jus.br",
+            "expiry": 1769869065,
+            "httpOnly": false,
+            "name": "__utma",
+            "path": "/",
+            "sameSite": "Lax",
+            "secure": true,
+            "value": "173948983.2017237622.1735307124.1735307124.1735309061.2"
+        },
+        {
+            "domain": ".esaj.tjsp.jus.br",
+            "httpOnly": false,
+            "name": "K-JSESSIONID-lnmpmgnp",
+            "path": "/cjsg",
+            "sameSite": "Lax",
+            "secure": true,
+            "value": "B143C31FEF4E329367BFB8797E8088A6"
+        },
+        {
+            "domain": ".esaj.tjsp.jus.br",
+            "httpOnly": false,
+            "name": "__utmc",
+            "path": "/",
+            "sameSite": "Lax",
+            "secure": true,
+            "value": "173948983"
+        },
+        {
+            "domain": ".esaj.tjsp.jus.br",
+            "expiry": 1751077065,
+            "httpOnly": false,
+            "name": "__utmz",
+            "path": "/",
+            "sameSite": "Lax",
+            "secure": true,
+            "value": "173948983.1735307124.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)"
+        },
+        {
+            "domain": ".esaj.tjsp.jus.br",
+            "expiry": 1735309660,
+            "httpOnly": false,
+            "name": "__utmt",
+            "path": "/",
+            "sameSite": "Lax",
+            "secure": true,
+            "value": "1"
+        },
+        {
+            "domain": ".esaj.tjsp.jus.br",
+            "httpOnly": false,
+            "name": "JSESSIONID",
+            "path": "/cjsg",
+            "sameSite": "Lax",
+            "secure": true,
+            "value": "2F07103ABBB5D32521C29C7913910077.cjsg1"
+        }
+    ],
+    "localStorage": {
+        "_grecaptcha": "09AJNbFnecCUt7c6APTAfP_CjJ-RyVOiZ70P6FKH4HIXNPkpih1b3j0VI6G3t_Qa2CaC_Fx7qMERDdIOK9GPbckJ_rbFpgHgMALuI9DoAZTaUrPX4FPtwb5xvefzGX8Jbt",
+        "clear": {},
+        "getItem": {},
+        "key": {},
+        "length": 7,
+        "removeItem": {},
+        "setItem": {}
+    }
+}
