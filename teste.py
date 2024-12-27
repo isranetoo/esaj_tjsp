@@ -5,34 +5,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
-
-def save_session_data(driver, session_file="session_data.json"):
+def manage_session_and_search(driver, session_file="session_data.json"):
     """
-    Salva os dados da sessão, como cookies e local storage, para reutilização futura.
-    """
-    try:
-        cookies = driver.get_cookies()
-        current_url = driver.current_url
-        domain = current_url.split("//")[1].split("/")[0] 
-        valid_cookies = [cookie for cookie in cookies if domain in cookie.get("domain", "")]
-
-        local_storage = driver.execute_script("return window.localStorage;")
-        session_data = {
-            "cookies": valid_cookies,
-            "localStorage": local_storage,
-        }
-    #---------------------------------------------------------------------#
-        with open(session_file, "w", encoding="utf-8") as file:
-            json.dump(session_data, file, ensure_ascii=False, indent=4)
-    #---------------------------------------------------------------------#
-        print(f"Dados da sessão salvos em {session_file}.")
-    except Exception as e:
-        print(f"Erro ao salvar os dados da sessão: {e}")
-
-
-def load_session_data(driver, session_file="session_data.json"):
-    """
-    Carrega os dados da sessão a partir de um arquivo JSON e aplica ao navegador.
+    Gerencia a sessão do navegador (carregando ou salvando) e realiza a busca.
     """
     try:
         with open(session_file, "r", encoding="utf-8") as file:
@@ -54,13 +29,8 @@ def load_session_data(driver, session_file="session_data.json"):
     except Exception as e:
         print(f"Erro ao carregar os dados da sessão: {e}")
 
-
-def search_and_collect(driver):
-    """
-    Realiza a busca e coleta informações organizadas das linhas 1 até 21 da tabela, salvando em JSON.
-    """
-    url = "https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do"
     try:
+        url = "https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do"
         driver.get(url)
         time.sleep(2)
 
@@ -69,8 +39,27 @@ def search_and_collect(driver):
         search_input.send_keys(Keys.RETURN)
         print("Busca realizada com sucesso.")
     except Exception as e:
-        print(f"Erro durante a busca ou coleta de informações: {e}")
+        print(f"Erro durante a busca: {e}")
 
+    
+    try:
+        cookies = driver.get_cookies()
+        current_url = driver.current_url
+        domain = current_url.split("//")[1].split("/")[0] 
+        valid_cookies = [cookie for cookie in cookies if domain in cookie.get("domain", "")]
+
+        local_storage = driver.execute_script("return window.localStorage;")
+        session_data = {
+            "cookies": valid_cookies,
+            "localStorage": local_storage,
+        }
+
+        with open(session_file, "w", encoding="utf-8") as file:
+            json.dump(session_data, file, ensure_ascii=False, indent=4)
+
+        print(f"Dados da sessão salvos em {session_file}.")
+    except Exception as e:
+        print(f"Erro ao salvar os dados da sessão: {e}")
 
 if __name__ == "__main__":
     chrome_options = Options()
@@ -82,8 +71,6 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(options=chrome_options)
 
     try:
-        load_session_data(driver)
-        search_and_collect(driver)
-        save_session_data(driver)
+        manage_session_and_search(driver)
     finally:
         driver.quit()
