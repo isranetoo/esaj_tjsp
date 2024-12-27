@@ -1,6 +1,7 @@
 import json
 import time
 import requests
+from lxml import html
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -14,7 +15,7 @@ def save_session_data(driver, session_file="session_data.json"):
     try:
         cookies = driver.get_cookies()
         current_url = driver.current_url
-        domain = current_url.split("//")[1].split("/")[0]  # Extrai o domínio atual.
+        domain = current_url.split("//")[1].split("/")[0] 
         valid_cookies = [cookie for cookie in cookies if domain in cookie.get("domain", "")]
 
         local_storage = driver.execute_script("return window.localStorage;")
@@ -63,7 +64,6 @@ def get_uuidCaptcha_from_payload():
     response = requests.post(url)
 
     if response.status_code == 200:
-        print("Resposta do servidor:", response.text)
         if 'uuidCaptcha' in response.text:
             print("uuidCaptcha encontrado:", response.text.split('uuidCaptcha":')[1].split('"')[1])
         else:
@@ -91,7 +91,7 @@ def search_and_collect(driver):
         time.sleep(5)
 
         i = 1
-        while i <= 20:
+        while i <= 10:
             result_xpath = f'//*[@id="divDadosResultado-A"]/table/tbody/tr[{i}]'
 
             try:

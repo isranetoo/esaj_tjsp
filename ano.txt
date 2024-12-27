@@ -1,1 +1,2 @@
-crie uma funcao onde colete as informações da sessao, possibilitando utilizala depois:
+escreva o codigo inteiro e atualizado com as mudanças novas
+
