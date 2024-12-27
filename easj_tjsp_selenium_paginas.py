@@ -231,7 +231,6 @@ if __name__ == "__main__":
 
         url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina=1&conversationId="
         driver.get(url)
-        time.sleep(5)  
 
         extract_case_data(driver)
 
