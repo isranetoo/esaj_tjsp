@@ -26,7 +26,7 @@ def load_session_data(driver, session_file="session_data.json"):
         with open(session_file, "r", encoding="utf-8") as file:
             session_data = json.load(file)
 
-        driver.get("https://esaj.tjsp.jus.br")
+        driver.get("https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do")
 
         for cookie in session_data.get("cookies", []):
             driver.add_cookie(cookie)
@@ -35,10 +35,13 @@ def load_session_data(driver, session_file="session_data.json"):
             driver.execute_script(f"window.localStorage.setItem('{key}', '{value}');")
 
         print(f"Dados da sessão carregados de '{session_file}'.")
+        return True
     except FileNotFoundError:
         print(f"Arquivo '{session_file}' não encontrado. Iniciando sem sessão anterior.")
+        return False
     except Exception as e:
         print(f"Erro ao carregar os dados da sessão: {e}")
+        return False
 
 
 def extract_case_data(driver):
@@ -220,7 +223,11 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(options=chrome_options)
 
     try:
-        load_session_data(driver)
+        session_loaded = load_session_data(driver)
+
+        if not session_loaded:
+            print("A sessão não foi carregada. Coletando dados de processos.")
+            driver.get("https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do")
 
         all_case_data = []  
         base_url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina={}&conversationId="
