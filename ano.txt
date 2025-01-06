@@ -1,0 +1,15 @@
+how to dowload the PDF from the page thats is on 
+
+XPATH : //*[@id="divDadosResultado-A"]/table/tbody/tr[1]/td[2]/table/tbody/tr[1]/td/a[2]
+
+ on the a tag have de "cdacordao="18746911"
+cdacordao="18746951"
+cdacordao="18746911"
+ and add to de link to dowload de PDF
+https://esaj.tjsp.jus.br/cjsg/getArquivo.do?cdAcordao=18746951&cdForo=0
+https://esaj.tjsp.jus.br/cjsg/getArquivo.do?cdAcordao=18746911&cdForo=0
+https://esaj.tjsp.jus.br/cjsg/getArquivo.do?cdAcordao=18746946&cdForo=0:
+
+write the full code
+
+
