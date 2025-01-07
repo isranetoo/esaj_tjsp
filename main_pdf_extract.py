@@ -36,6 +36,7 @@ def main(file_path, page_index=1):
     passivo = {
             "APELANTES": r'APELANTES:\s*(.+)',
             "APELADO": r'APELADO:\s*(.+)',
+            "APELANTE/APELADO:": r'Apelante/Apelado:\s*(.+)',
             "AGRAVADO": r'AGRAVADO:\s*(.+)',
             "AGRAVADA": r'AGRAVADA:\s*(.+)',
             "EMBARGADO": r'EMBARGADO:\s*(.+)',
@@ -51,8 +52,8 @@ def main(file_path, page_index=1):
     results = extract_patterns_from_pdf(file_path, page_index, patterns)
 
     print(f"Results for {file_path}:")
-    for key, value in results.items():
-        print(f"  {key}: {value if value else 'None'}")
+    for value in results.items():
+        print(f"{value if value else 'None'}")
 
 
 if __name__ == "__main__":

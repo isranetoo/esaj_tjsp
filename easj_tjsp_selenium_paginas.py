@@ -1,9 +1,11 @@
 import requests
+import json
+import main_pdf_extract 
+import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-import json
-import main_pdf_extract  
+from main_pdf_extract import main 
 
 
 def save_session_data(driver, session_file="session_data.json"):
@@ -75,6 +77,21 @@ def remove_prefix(text, prefix):
     return text
 
 
+patterns = {
+    "APELANTE": r'APELANTE:\s*(.+)',
+    "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
+    "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
+    "RECORRENTE": r'Recorrente:\s*(.+)',
+}
+
+# Extract the patterns
+extracted_data = main_pdf_extract.extract_patterns_from_pdf("processo_temp.pdf", 1, patterns)
+
+# Remove the prefixes from the keys
+cleaned_data = {key: re.sub(f"{key}:\s*", "", value) for key, value in extracted_data.items() if value}
+
+
+
 def extract_case_data(driver):
     """Coleta os dados da página de processos e baixa os PDFs correspondentes."""
     results = []
@@ -124,7 +141,13 @@ def extract_case_data(driver):
                         ),
                          "envolvidos": [
                     {
-                        "nome": None,
+                        "nome": main_pdf_extract.extract_patterns_from_pdf("processo_temp.pdf", 1, 
+                        {
+                            "APELANTE": r'APELANTE:\s*(.+)',
+                            "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
+                            "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
+                            "RECORRENTE": r'Recorrente:\s*(.+)',
+                        }),
                         "tipo": "RECLAMANTE",
                         "polo": "ATIVO",
                         "id_sistema": {"login": None},
@@ -267,7 +290,7 @@ if __name__ == "__main__":
         all_case_data = []
         base_url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina={}&conversationId="
         page = 1
-        while page <= 1:
+        while page <= 2:
             print(f"Acessando página {page}")
             driver.get(base_url.format(page))
 
