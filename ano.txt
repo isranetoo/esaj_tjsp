@@ -1,0 +1,6 @@
+faça com que antes de salvar no JSON os processos retire de "nome" o prefixo por exeplo 
+
+            "APELANTE": 
+            "AGRAVANTE": 
+            "EMBARGANTE": 
+            "RECORRENTE": ,

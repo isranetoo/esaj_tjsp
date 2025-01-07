@@ -5,7 +5,7 @@ import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from main_pdf_extract import main 
+from main_pdf_extract import main
 
 
 def save_session_data(driver, session_file="session_data.json"):
@@ -62,8 +62,7 @@ def download_pdf(cdacordao):
                 f.write(response.content)
             print(f"PDF {cdacordao} baixado com sucesso.")
 
-            
-            main_pdf_extract.main(output_file, page_index=1)  
+            main_pdf_extract.main(output_file, page_index=1)
         else:
             print(f"Erro ao baixar o PDF para {cdacordao}. Status: {response.status_code}")
     except Exception as e:
@@ -77,33 +76,16 @@ def remove_prefix(text, prefix):
     return text
 
 
-patterns = {
-    "APELANTE": r'APELANTE:\s*(.+)',
-    "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
-    "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
-    "RECORRENTE": r'Recorrente:\s*(.+)',
-}
-
-# Extract the patterns
-extracted_data = main_pdf_extract.extract_patterns_from_pdf("processo_temp.pdf", 1, patterns)
-
-# Remove the prefixes from the keys
-cleaned_data = {key: re.sub(f"{key}:\s*", "", value) for key, value in extracted_data.items() if value}
-
-
-
 def extract_case_data(driver):
     """Coleta os dados da página de processos e baixa os PDFs correspondentes."""
     results = []
     rows_xpath = "//body/table[1]/tbody/tr"
 
     try:
-        # Localiza as linhas da tabela de processos na página
         rows = driver.find_elements(By.XPATH, rows_xpath)
 
         for i, row in enumerate(rows, start=1):
             try:
-                # Extração de dados básicos do processo
                 case_data = {                             
                     "numero":  row.find_element(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a[1]").text,
                     "valorDaCausa": None,
@@ -112,9 +94,7 @@ def extract_case_data(driver):
                     "vara_code": None,
                     "area": None,
                     "tribunal": "TJ-SP",
-                    "comarca":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[4]/td").text,
-                            "Comarca: "      
-                        ),
+                    "comarca": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[4]/td").text, "Comarca: "),
                     "instancias": [{
                         "fonte_script": "Scrapper",
                         "fonte_sistema": "TJ-SP",
@@ -123,95 +103,83 @@ def extract_case_data(driver):
 
                         "grau": None,
                         "classe": None,
-                        "orgaoJulgador": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[5]/td").text,
-                          "Órgão julgador: "             
-                        ),
-
+                        "orgaoJulgador": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[5]/td").text, "Órgão julgador: "),
                         "segredoJustica": None,
                         "justicaGratuita": None,
-
                         "assunto_principal": None,
-                        "assuntos": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[2]/td").text, 
-                            "Classe/Assunto: "
-                        ),
-
+                        "assuntos": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[2]/td").text, "Classe/Assunto: "),
                         "first_mov": None,
-                        "last_mov": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,
-                          "Data de publicação: "              
-                        ),
-                         "envolvidos": [
-                    {
-                        "nome": main_pdf_extract.extract_patterns_from_pdf("processo_temp.pdf", 1, 
-                        {
-                            "APELANTE": r'APELANTE:\s*(.+)',
-                            "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
-                            "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
-                            "RECORRENTE": r'Recorrente:\s*(.+)',
-                        }),
-                        "tipo": "RECLAMANTE",
-                        "polo": "ATIVO",
-                        "id_sistema": {"login": None},
-                        "documento": [],
-                        "endereco": {},
-                        "representantes": [
+                        "last_mov": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text, "Data de publicação: "),
+                        "envolvidos": [
                             {
-                                "nome": None,
-                                "tipo": "ADVOGADO",
+                                "nome": {key: remove_prefix(value, key) for key, value in main_pdf_extract.extract_patterns_from_pdf(
+                                    "processo_temp.pdf", 1, {
+                                        "APELANTE": r'APELANTE:\s*(.+)',
+                                        "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
+                                        "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
+                                        "RECORRENTE": r'Recorrente:\s*(.+)',
+                                    }).items()},
+                                "tipo": "RECLAMANTE",
                                 "polo": "ATIVO",
                                 "id_sistema": {"login": None},
-                                "documento": [{"CPF": None}],
-                                "endereco": {
-                                    "logradouro": None,
-                                    "numero": None,
-                                    "complemento": None,
-                                    "bairro": None,
-                                    "municipio": None,
-                                    "estado": None,
-                                    "cep": None,
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "nome": None,
-                        "tipo": "RECLAMADO",
-                        "polo": "PASSIVO",
-                        "id_sistema": {"login": None},
-                        "documento": [],
-                        "endereco": {},
-                        "representantes": [
+                                "documento": [],
+                                "endereco": {},
+                                "representantes": [
+                                    {
+                                        "nome": None,
+                                        "tipo": "ADVOGADO",
+                                        "polo": "ATIVO",
+                                        "id_sistema": {"login": None},
+                                        "documento": [{"CPF": None}],
+                                        "endereco": {
+                                            "logradouro": None,
+                                            "numero": None,
+                                            "complemento": None,
+                                            "bairro": None,
+                                            "municipio": None,
+                                            "estado": None,
+                                            "cep": None,
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "nome": None,
-                                "tipo": "ADVOGADO",
+                                "tipo": "RECLAMADO",
                                 "polo": "PASSIVO",
                                 "id_sistema": {"login": None},
-                                "documento": [{"CPF": None}],
-                                "endereco": {
-                                    "logradouro": None,
-                                    "numero": None,
-                                    "complemento": None,
-                                    "bairro": None,
-                                    "municipio": None,
-                                    "estado": None,
-                                    "cep": None
-                                }
+                                "documento": [],
+                                "endereco": {},
+                                "representantes": [
+                                    {
+                                        "nome": None,
+                                        "tipo": "ADVOGADO",
+                                        "polo": "PASSIVO",
+                                        "id_sistema": {"login": None},
+                                        "documento": [{"CPF": None}],
+                                        "endereco": {
+                                            "logradouro": None,
+                                            "numero": None,
+                                            "complemento": None,
+                                            "bairro": None,
+                                            "municipio": None,
+                                            "estado": None,
+                                            "cep": None
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "nome": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[3]/td").text, "Relator(a): "),
+                                "tipo": "RELATOR(A)",
+                                "polo": "OUTROS",
+                                "id_sistema": {"login": None},
+                                "documento": [],
+                                "endereco": {},
+                                "representantes": []
                             }
-                        ]
-                    },
-                    {
-                        "nome":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[3]/td").text,
-                            "Relator(a): "
-                        ),
-                        "tipo": "RELATOR(A)",
-                        "polo": "OUTROS",
-                        "id_sistema": {"login": None},
-                        "documento": [],
-                        "endereco": {},
-                        "representantes": []
-                    }
-                ],
-
-                "movimentacoes": [
+                        ],
+                        "movimentacoes": [
                     {
                         "titulo": "Data de publicação",
                         "tipoConteudo": "HTML",
@@ -290,7 +258,7 @@ if __name__ == "__main__":
         all_case_data = []
         base_url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina={}&conversationId="
         page = 1
-        while page <= 2:
+        while page <= 1:
             print(f"Acessando página {page}")
             driver.get(base_url.format(page))
 
