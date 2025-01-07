@@ -31,37 +31,27 @@ def main(file_path, page_index=1):
     """
     Função principal para extrair padrões de um PDF.
     """
-    patterns = {
-        #POLO ATIVO
-        "APELANTE": r'APELANTE:\s*(.+)',
-
-        #POLO PASSIVO
-        "APELANTES": r'APELANTES:\s*(.+)',
-        "APELADO": r'APELADO:\s*(.+)',
-        
-        #POLO ATIVO
-        "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
-        
-        #POLO PASSIVO
-        "AGRAVADO": r'AGRAVADO:\s*(.+)',
-        "AGRAVADA": r'AGRAVADA:\s*(.+)',
-        
-        #POLO ATIVO
-        "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
-        
-        #POLO PASSIVO
-        "EMBARGADO": r'EMBARGADO:\s*(.+)',
-        
-        #POLO ATIVO
-        "RECORRENTE:": r'Recorrente:\s*(.+)',
-        
-        #POLO PASSIVO
-        "RECORRIDO(A):": r'Recorrido\(a\): \s*(.+)',
-
-        
-        "R$": r'R\$\s*([\d\.,]+)',
+    ativo = {
+            "APELANTE": r'APELANTE:\s*(.+)',
+            "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
+            "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
+            "RECORRENTE": r'Recorrente:\s*(.+)',
+        }
+    passivo = {
+            "APELANTES": r'APELANTES:\s*(.+)',
+            "APELADO": r'APELADO:\s*(.+)',
+            "AGRAVADO": r'AGRAVADO:\s*(.+)',
+            "AGRAVADA": r'AGRAVADA:\s*(.+)',
+            "EMBARGADO": r'EMBARGADO:\s*(.+)',
+            "RECORRIDO(A)": r'Recorrido\(a\): \s*(.+)',
+        }
+    
+    outros = {
+            "R$": r'R\$\s*([\d\.,]+)',
     }
 
+    patterns = {**ativo, **passivo, **outros}
+    
     results = extract_patterns_from_pdf(file_path, page_index, patterns)
 
     print(f"Results for {file_path}:")
