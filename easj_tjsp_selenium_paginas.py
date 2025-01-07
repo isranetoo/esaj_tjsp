@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import json
-import main_pdf_extract  # Importa o script de extração de PDF
+import main_pdf_extract  
 
 
 def save_session_data(driver, session_file="session_data.json"):
@@ -60,8 +60,8 @@ def download_pdf(cdacordao):
                 f.write(response.content)
             print(f"PDF {cdacordao} baixado com sucesso.")
 
-            # Corrigir chamada da função main, passando o file_path corretamente
-            main_pdf_extract.main(output_file, page_index=1)  # Passa o caminho do arquivo como argumento
+            
+            main_pdf_extract.main(output_file, page_index=1)  
         else:
             print(f"Erro ao baixar o PDF para {cdacordao}. Status: {response.status_code}")
     except Exception as e:

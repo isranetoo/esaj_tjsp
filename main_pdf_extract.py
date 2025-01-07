@@ -19,11 +19,7 @@ def extract_patterns_from_pdf(file_path, page_index, patterns):
         for pattern_name, pattern in patterns.items():
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
-                results[pattern_name] = match.group(1).strip()
-            #--------------------------------#
-            else:
-                results[pattern_name] = None
-            #--------------------------------#                 
+                results[pattern_name] = match.group(1).strip()                
         return results
 
 
