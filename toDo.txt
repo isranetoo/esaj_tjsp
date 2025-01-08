@@ -1,0 +1,19 @@
+- Retira o prefixo do "nome" do Polo ativo
+- Colocar o Nome certo no Processo certo
+- Colotar "nome" no Polo Passivo e retirar seu prefixo 
+- Melhorar o programa "main_pdf_extract.py" deixando ele mais eficiente
+- Mudar a sessao , possibilitando que possa ser usado outros assuntos alem do ITAU
+
+
+
+
+"nome": [
+        remove_prefix(value, key) for key, value in main_pdf_extract.extract_patterns_from_pdf(
+            "processo_temp.pdf", 1, {
+                "APELANTE": r'APELANTE:\s*(.+)',
+                "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
+                "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
+                "RECORRENTE": r'Recorrente:\s*(.+)',
+            }
+        ).items()
+    ],

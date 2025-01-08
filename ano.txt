@@ -1,4 +1,0 @@
-- Retira o prefixo do "nome" do Polo ativo
-- Colotar "nome" no Polo Passivo e retirar seu prefixo 
-- Melhorar o programa "main_pdf_extract.py" deixando ele mais eficiente
-- Mudar a sessao , possibilitando que possa ser usado outros assuntos alem do ITAU
