@@ -5,15 +5,3 @@
 - Mudar a sessao , possibilitando que possa ser usado outros assuntos alem do ITAU
 
 
-
-
-"nome": [
-        remove_prefix(value, key) for key, value in main_pdf_extract.extract_patterns_from_pdf(
-            "processo_temp.pdf", 1, {
-                "APELANTE": r'APELANTE:\s*(.+)',
-                "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
-                "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
-                "RECORRENTE": r'Recorrente:\s*(.+)',
-            }
-        ).items()
-    ],
