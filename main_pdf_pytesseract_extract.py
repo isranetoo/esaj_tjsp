@@ -142,6 +142,4 @@ for result in all_results:
                 print(f"\n{key}:")
                 print("-" * 30)
                 print(value)
-            else:
-                print(f"\n{key}: None")
     print("=" * 50)
