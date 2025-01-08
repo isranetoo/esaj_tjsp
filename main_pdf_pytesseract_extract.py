@@ -23,7 +23,7 @@ def extract_patterns_from_pdf(file_path, page_index, patterns):
                 results[pattern_name] = match.group(1).strip()
             else:
                 results[pattern_name] = None
-        return results
+        return results   
 
 def save_pdf_cuts_as_images(pdf_path, page_index, cuts, output_folder):
     try:
@@ -53,13 +53,27 @@ def extract_text_from_images(img_path, lista_cortes_imagem):
     for i, coordenadas in enumerate(lista_cortes_imagem):
         image = Image.open(img_path)
         cropped_imagem = image.crop(coordenadas)
-        sharpened_imagem = cropped_imagem.filter(ImageFilter.SHARPEN)
+        
+        
+        enhanced_image = cropped_imagem.convert('L')  
+        enhanced_image = enhanced_image.filter(ImageFilter.SHARPEN)
+        enhanced_image = enhanced_image.point(lambda x: 0 if x < 128 else 255, '1')  
 
-        ocr_config = '--psm 11 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890()-:,.\/_ '
-        result = pytesseract.image_to_string(sharpened_imagem, config=ocr_config)
-        result = result.strip()
+        
+        custom_config = r'--oem 3 --psm 6 -c preserve_interword_spaces=1'
+        result = pytesseract.image_to_string(
+            enhanced_image,
+            config=custom_config,
+            lang='por'  
+        )
 
-        resultados[f"processo_{i}"] = result
+        
+        formatted_result = '\n'.join(
+            line.strip() for line in result.splitlines() 
+            if line.strip()
+        )
+
+        resultados[f"processo_{i}"] = formatted_result
 
     return resultados
 
@@ -120,12 +134,14 @@ for pdf_file in pdf_files:
             results.update(image_results)
 
 for result in all_results:
-    print(f"Results for {result['File']}:")
+    print(f"\nResults for {result['File']}:")
+    print("=" * 50)
     for key, value in result.items():
         if key != "File":
             if value:
-                print(f"  {key}: {value}")
+                print(f"\n{key}:")
+                print("-" * 30)
+                print(value)
             else:
-                print(f"  {key}: None")
-    print("-" * 40)
-    
+                print(f"\n{key}: None")
+    print("=" * 50)
