@@ -1,51 +1,32 @@
 import requests
 import json
+import os
 import main_pdf_extract 
-import re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from main_pdf_extract import main
 
 
-def save_session_data(driver, session_file="session_data.json"):
-    """Salva os dados da sessão (cookies e local storage)."""
+def save_session_data(driver):
     try:
         cookies = driver.get_cookies()
-        local_storage = driver.execute_script("return window.localStorage;")
-        session_data = {
-            "cookies": cookies,
-            "localStorage": local_storage,
-        }
-        with open(session_file, "w", encoding="utf-8") as file:
-            json.dump(session_data, file, ensure_ascii=False, indent=4)
-        print(f"Dados da sessão salvos em '{session_file}'.")
+        with open("session_cookies.json", "w") as file:
+            json.dump(cookies, file)
     except Exception as e:
-        print(f"Erro ao salvar os dados da sessão: {e}")
+        print(f"Erro ao salvar cookies da sessão: {str(e)}")
 
 
-def load_session_data(driver, session_file="session_data.json"):
-    """Carrega os dados da sessão (cookies e local storage)."""
+def load_session_data(driver):
     try:
-        with open(session_file, "r", encoding="utf-8") as file:
-            session_data = json.load(file)
-
-        driver.get("https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do")
-
-        for cookie in session_data.get("cookies", []):
-            driver.add_cookie(cookie)
-
-        for key, value in session_data.get("localStorage", {}).items():
-            driver.execute_script(f"window.localStorage.setItem('{key}', '{value}');")
-
-        print(f"Dados da sessão carregados de '{session_file}'.")
-        return True
-    except FileNotFoundError:
-        print(f"Arquivo '{session_file}' não encontrado. Iniciando sem sessão anterior.")
-        return False
+        if os.path.exists("session_cookies.json"):
+            with open("session_cookies.json", "r") as file:
+                cookies = json.load(file)
+            for cookie in cookies:
+                driver.add_cookie(cookie)
+            return True
     except Exception as e:
-        print(f"Erro ao carregar os dados da sessão: {e}")
-        return False
+        print(f"Erro ao carregar cookies da sessão: {str(e)}")
+    return False
 
 
 def download_pdf(cdacordao):
@@ -86,6 +67,27 @@ def extract_case_data(driver):
 
         for i, row in enumerate(rows, start=1):
             try:
+                # Baixa o PDF primeiro
+                links = row.find_elements(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a")
+                for link in links:
+                    cdacordao = link.get_attribute("cdacordao")
+                    if cdacordao:
+                        download_pdf(cdacordao)
+
+                # Extrai os padrões do PDF
+                pdf_patterns = main_pdf_extract.extract_patterns_from_pdf(
+                    "processo_temp.pdf", 1, {
+                        "APELANTE": r'APELANTE:\s*(.+)',
+                        "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
+                        "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
+                        "RECORRENTE": r'Recorrente:\s*(.+)',
+                    }
+                ) or {}
+
+                # Garante que pdf_patterns é um dicionário, mesmo que vazio
+                if pdf_patterns is None:
+                    pdf_patterns = {}
+
                 case_data = {                             
                     "numero":  row.find_element(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a[1]").text,
                     "valorDaCausa": None,
@@ -112,13 +114,8 @@ def extract_case_data(driver):
                         "last_mov": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text, "Data de publicação: "),
                         "envolvidos": [
                             {
-                                "nome": {key: remove_prefix(value, key) for key, value in main_pdf_extract.extract_patterns_from_pdf(
-                                    "processo_temp.pdf", 1, {
-                                        "APELANTE": r'APELANTE:\s*(.+)',
-                                        "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
-                                        "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
-                                        "RECORRENTE": r'Recorrente:\s*(.+)',
-                                    }).items()},
+                                "nome": {key: (remove_prefix(value, key) if value else None) 
+                                   for key, value in pdf_patterns.items()},
                                 "tipo": "RECLAMANTE",
                                 "polo": "ATIVO",
                                 "id_sistema": {"login": None},
@@ -221,13 +218,6 @@ def extract_case_data(driver):
         ]
     }
 
-                
-                links = row.find_elements(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a")
-                for link in links:
-                    cdacordao = link.get_attribute("cdacordao")
-                    if cdacordao:
-                        download_pdf(cdacordao)
-
                 results.append(case_data)
                 print(f"Processo {i} coletado com sucesso.")
             except Exception as e:
@@ -258,20 +248,26 @@ if __name__ == "__main__":
         all_case_data = []
         base_url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina={}&conversationId="
         page = 1
-        while page <= 1:
-            print(f"Acessando página {page}")
-            driver.get(base_url.format(page))
+        while page <= 10:
+            try:
+                print(f"Acessando página {page}")
+                driver.get(base_url.format(page))
+                
+                case_data = extract_case_data(driver)
+                all_case_data.extend(case_data)
+                
+                page += 1
+            except Exception as e:
+                print(f"Erro ao processar página {page}: {str(e)}")
+                continue
 
-            case_data = extract_case_data(driver)
-            all_case_data.extend(case_data)
-
-            page += 1
-
-        with open("processos.json", "w", encoding="utf-8") as file:
-            json.dump(all_case_data, file, ensure_ascii=False, indent=4)
-
-        print("Dados de todos os processos salvos no arquivo 'processos.json'.")
-        save_session_data(driver)
+        try:
+            with open("processos.json", "w", encoding="utf-8") as file:
+                json.dump(all_case_data, file, ensure_ascii=False, indent=4)
+            print("Dados de todos os processos salvos no arquivo 'processos.json'.")
+            save_session_data(driver)
+        except Exception as e:
+            print(f"Erro ao salvar dados: {str(e)}")
 
     finally:
         driver.quit()

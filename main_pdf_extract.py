@@ -6,21 +6,24 @@ def extract_patterns_from_pdf(file_path, page_index, patterns):
     """
     Extrai padrões específicos de texto de uma página de um arquivo PDF.
     """
-    with open(file_path, "rb") as file:
-        reader = PyPDF2.PdfReader(file)
-        if page_index >= len(reader.pages):
-            print(f"Page {page_index} not found in {file_path}. Skipping...")
-            return {key: None for key in patterns}
-        
-        page = reader.pages[page_index]
-        text = page.extract_text()
+    try:
+        with open(file_path, "rb") as file:
+            reader = PyPDF2.PdfReader(file)
+            if page_index >= len(reader.pages):
+                print(f"Page {page_index} not found in {file_path}. Skipping...")
+                return {key: None for key in patterns}
+            
+            page = reader.pages[page_index]
+            text = page.extract_text()
 
-        results = {}
-        for pattern_name, pattern in patterns.items():
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                results[pattern_name] = match.group(1).strip()                
-        return results
+            results = {}
+            for pattern_name, pattern in patterns.items():
+                match = re.search(pattern, text, re.IGNORECASE)
+                results[pattern_name] = match.group(1).strip() if match else None
+            return results
+    except Exception as e:
+        print(f"Error extracting patterns from PDF: {e}")
+        return {key: None for key in patterns}
 
 
 def main(file_path, page_index=1):
