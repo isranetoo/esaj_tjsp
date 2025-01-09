@@ -34,7 +34,7 @@ def download_pdf(cdacordao):
     Baixa o PDF com base no cdacordao e executa a extração.
     """
     url = f"https://esaj.tjsp.jus.br/cjsg/getArquivo.do?cdAcordao={cdacordao}&cdForo=0"
-    output_file = "processo_temp.pdf"  # Nome fixo para sobrescrever o arquivo anterior
+    output_file = "processo_temp.pdf"  
 
     try:
         response = requests.get(url)
@@ -67,15 +67,16 @@ def extract_case_data(driver):
 
         for i, row in enumerate(rows, start=1):
             try:
-                # Baixa o PDF primeiro
+               
                 links = row.find_elements(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a")
                 for link in links:
                     cdacordao = link.get_attribute("cdacordao")
                     if cdacordao:
                         download_pdf(cdacordao)
 
-                # Extrai os padrões do PDF
-                pdf_patterns = main_pdf_extract.extract_patterns_from_pdf(
+               
+                # Padrões para parte ativa
+                pdf_patterns_ativo = main_pdf_extract.extract_patterns_from_pdf(
                     "processo_temp.pdf", 1, {
                         "APELANTE": r'APELANTE:\s*(.+)',
                         "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
@@ -84,9 +85,33 @@ def extract_case_data(driver):
                     }
                 ) or {}
 
-                # Garante que pdf_patterns é um dicionário, mesmo que vazio
-                if pdf_patterns is None:
-                    pdf_patterns = {}
+                # Padrões para parte passiva
+                pdf_patterns_passivo = main_pdf_extract.extract_patterns_from_pdf(
+                    "processo_temp.pdf", 1, {
+                        "APELADO": r'APELADO:\s*(.+)',
+                        "AGRAVADO": r'AGRAVADO:\s*(.+)',
+                        "EMBARGADO": r'EMBARGADO:\s*(.+)',
+                        "RECORRIDO": r'Recorrido:\s*(.+)',
+                    }
+                ) or {}
+
+                # Extrai nome e tipo para parte ativa
+                nome_parte_ativa = None
+                tipo_parte_ativa = None
+                for key, value in pdf_patterns_ativo.items():
+                    if value:
+                        nome_parte_ativa = value.strip()
+                        tipo_parte_ativa = key
+                        break
+
+                # Extrai nome e tipo para parte passiva
+                nome_parte_passiva = None
+                tipo_parte_passiva = None
+                for key, value in pdf_patterns_passivo.items():
+                    if value:
+                        nome_parte_passiva = value.strip()
+                        tipo_parte_passiva = key
+                        break
 
                 case_data = {                             
                     "numero":  row.find_element(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a[1]").text,
@@ -114,9 +139,8 @@ def extract_case_data(driver):
                         "last_mov": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text, "Data de publicação: "),
                         "envolvidos": [
                             {
-                                "nome": {key: (remove_prefix(value, key) if value else None) 
-                                   for key, value in pdf_patterns.items()},
-                                "tipo": "RECLAMANTE",
+                                "nome": nome_parte_ativa,
+                                "tipo": tipo_parte_ativa if tipo_parte_ativa else "RECLAMANTE",
                                 "polo": "ATIVO",
                                 "id_sistema": {"login": None},
                                 "documento": [],
@@ -141,8 +165,8 @@ def extract_case_data(driver):
                                 ]
                             },
                             {
-                                "nome": None,
-                                "tipo": "RECLAMADO",
+                                "nome": nome_parte_passiva,
+                                "tipo": tipo_parte_passiva if tipo_parte_passiva else "RECLAMADO",
                                 "polo": "PASSIVO",
                                 "id_sistema": {"login": None},
                                 "documento": [],
@@ -248,7 +272,7 @@ if __name__ == "__main__":
         all_case_data = []
         base_url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina={}&conversationId="
         page = 1
-        while page <= 10:
+        while page <= 15:
             try:
                 print(f"Acessando página {page}")
                 driver.get(base_url.format(page))
