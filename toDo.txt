@@ -1,8 +1,6 @@
 - Melhorar o programa "main_pdf_extract.py" deixando ele mais eficiente
-- os 4 ultimos numeros do codigo do processo é o "vara_code"
+- Pegar a primeira pagina do PDF para o programa main_pdf_extract.py e usar como referencia para as infos
+- Juntar os dois programas em um unico programa 
+- Filtrar as Infos que viram da primeira pagina do PDF main_pdf_extract
 
 
-estabeleça um header da segunda pagina do PDF que sempre vem antes da Ementa cujo o programa easj_tjsp_selenium_paginas.py ja coletou na funçao extract_case_data
-e entao o programa tem que verificar se a ementa coletada esta igual ao pdf
-
-ementa sempre vem depois do hearder da segunda pagina, entao o programa tem que verificar se a ementa coletada esta igual ao pdf 
