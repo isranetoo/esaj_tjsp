@@ -1,33 +1,79 @@
 import requests
 import json
 import os
-import main_pdf_extract 
+import re
+import PyPDF2
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-
-def save_session_data(driver):
+def extract_patterns_from_pdf(file_path, page_index, patterns):
+    """
+    Extrai padrões específicos de texto de uma página de um arquivo PDF.
+    """
     try:
-        cookies = driver.get_cookies()
-        with open("session_cookies.json", "w") as file:
-            json.dump(cookies, file)
+        with open(file_path, "rb") as file:
+            reader = PyPDF2.PdfReader(file)
+            if page_index >= len(reader.pages):
+                print(f"Page {page_index} not found in {file_path}. Skipping...")
+                return {key: None for key in patterns}
+            
+            page = reader.pages[page_index]
+            text = page.extract_text()
+
+            results = {}
+            for pattern_name, pattern in patterns.items():
+                match = re.search(pattern, text, re.IGNORECASE)
+                results[pattern_name] = match.group(1).strip() if match else None
+            return results
     except Exception as e:
-        print(f"Erro ao salvar cookies da sessão: {str(e)}")
+        print(f"Error extracting patterns from PDF: {e}")
+        return {key: None for key in patterns}
 
-
-def load_session_data(driver):
+def extract_text_from_pdf(file_path, page_index):
+    """
+    Extrai todo o texto de uma página específica de um arquivo PDF.
+    """
     try:
-        if os.path.exists("session_cookies.json"):
-            with open("session_cookies.json", "r") as file:
-                cookies = json.load(file)
-            for cookie in cookies:
-                driver.add_cookie(cookie)
-            return True
+        with open(file_path, "rb") as file:
+            reader = PyPDF2.PdfReader(file)
+            if page_index >= len(reader.pages):
+                print(f"Page {page_index} not found in {file_path}. Skipping...")
+                return None
+            
+            page = reader.pages[page_index]
+            text = page.extract_text()
+            return text
     except Exception as e:
-        print(f"Erro ao carregar cookies da sessão: {str(e)}")
-    return False
+        print(f"Error extracting text from PDF: {e}")
+        return None
 
+def extract_header_and_ementa_from_pdf(file_path, page_index):
+    """
+    Extrai o header e a ementa da página especificada de um arquivo PDF.
+    """
+    try:
+        with open(file_path, "rb") as file:
+            reader = PyPDF2.PdfReader(file)
+            if page_index >= len(reader.pages):
+                print(f"Page {page_index} not found in {file_path}. Skipping...")
+                return None, None
+            
+            page = reader.pages[page_index]
+            text = page.extract_text()
+
+            ementa_pos = text.find("Ementa:")
+            if ementa_pos != -1:
+                header = text[:ementa_pos].strip()
+                ementa_text = text[ementa_pos:].replace("Ementa:", "").strip()
+                return header, ementa_text
+            return None, None
+            
+    except Exception as e:
+        print(f"Error extracting header and ementa from PDF: {e}")
+        return None, None
 
 def download_pdf(cdacordao):
     """
@@ -43,19 +89,30 @@ def download_pdf(cdacordao):
                 f.write(response.content)
             print(f"PDF {cdacordao} baixado com sucesso.")
 
-            main_pdf_extract.main(output_file, page_index=1)
+            # Extrair informações da primeira página
+            first_page_text = extract_text_from_pdf(output_file, 0)
+            if first_page_text:
+                print(f"Text from first page of {output_file}:")
+                print(first_page_text)
+
+            # Extrair header e ementa da segunda página
+            header, ementa = extract_header_and_ementa_from_pdf(output_file, 1)
+            if header:
+                print(f"Header from second page of {output_file}:")
+                print(header)
+            if ementa:
+                print(f"Ementa from second page of {output_file}:")
+                print(ementa)
         else:
             print(f"Erro ao baixar o PDF para {cdacordao}. Status: {response.status_code}")
     except Exception as e:
         print(f"Erro ao tentar baixar o PDF {cdacordao}: {e}")
-
 
 def remove_prefix(text, prefix):
     """Remove o prefixo especificado do texto, se presente."""
     if text and text.startswith(prefix):
         return text.replace(prefix, "").strip()
     return text
-
 
 def extract_case_data(driver):
     """Coleta os dados da página de processos e baixa os PDFs correspondentes."""
@@ -67,14 +124,13 @@ def extract_case_data(driver):
 
         for i, row in enumerate(rows, start=1):
             try:
-               
                 links = row.find_elements(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a")
                 for link in links:
                     cdacordao = link.get_attribute("cdacordao")
                     if cdacordao:
                         download_pdf(cdacordao)
 
-                pdf_header, pdf_ementa = main_pdf_extract.extract_header_and_ementa_from_pdf("processo_temp.pdf", 1)
+                pdf_header, pdf_ementa = extract_header_and_ementa_from_pdf("processo_temp.pdf", 1)
 
                 collected_ementa = remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[8]/td/div[1]").text, "Ementa:")
                 
@@ -97,7 +153,7 @@ def extract_case_data(driver):
                 print(f"\nTextos correspondem: {ementa_match}")
                 print("-" * 80)
 
-                pdf_patterns_ativo = main_pdf_extract.extract_patterns_from_pdf(
+                pdf_patterns_ativo = extract_patterns_from_pdf(
                     "processo_temp.pdf", 1, {
                         "APELANTE": r'APELANTE:\s*(.+)',
                         "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
@@ -106,7 +162,7 @@ def extract_case_data(driver):
                     }
                 ) or {}
 
-                pdf_patterns_passivo = main_pdf_extract.extract_patterns_from_pdf(
+                pdf_patterns_passivo = extract_patterns_from_pdf(
                     "processo_temp.pdf", 1, {
                         "APELADO": r'APELADO:\s*(.+)',
                         "AGRAVADO": r'AGRAVADO:\s*(.+)',
@@ -254,9 +310,7 @@ def extract_case_data(driver):
                         "usuarioJuntada": None,
                         "usuarioCriador": None,
                         "instancia": None,
-                        "ementa": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[8]/td/div[1]").text,
-                            "Ementa:"
-                        ),                                                                        
+                        "ementa": collected_ementa,
                     }
                 ]
             }
@@ -284,6 +338,25 @@ def extract_case_data(driver):
         print(f"Erro ao coletar dados da tabela: {e}")
         return []
 
+def save_session_data(driver):
+    try:
+        cookies = driver.get_cookies()
+        with open("session_cookies.json", "w") as file:
+            json.dump(cookies, file)
+    except Exception as e:
+        print(f"Erro ao salvar cookies da sessão: {str(e)}")
+
+def load_session_data(driver):
+    try:
+        if os.path.exists("session_cookies.json"):
+            with open("session_cookies.json", "r") as file:
+                cookies = json.load(file)
+            for cookie in cookies:
+                driver.add_cookie(cookie)
+            return True
+    except Exception as e:
+        print(f"Erro ao carregar cookies da sessão: {str(e)}")
+    return False
 
 if __name__ == "__main__":
     chrome_options = Options()
