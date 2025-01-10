@@ -235,7 +235,10 @@ def extract_case_data(driver):
                         "publico": None,
                         "usuarioJuntada": None,
                         "usuarioCriador": None,
-                        "instancia": None
+                        "instancia": None,
+                        "ementa": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[8]/td/div[1]").text,
+                            "Ementa:"
+                        )
                     }
                 ]
             }
@@ -272,7 +275,7 @@ if __name__ == "__main__":
         all_case_data = []
         base_url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina={}&conversationId="
         page = 1
-        while page <= 15:
+        while page <= 1:
             try:
                 print(f"Acessando página {page}")
                 driver.get(base_url.format(page))
