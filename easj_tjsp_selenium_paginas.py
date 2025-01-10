@@ -74,8 +74,29 @@ def extract_case_data(driver):
                     if cdacordao:
                         download_pdf(cdacordao)
 
-               
-                # Padrões para parte ativa
+                pdf_header, pdf_ementa = main_pdf_extract.extract_header_and_ementa_from_pdf("processo_temp.pdf", 1)
+
+                collected_ementa = remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[8]/td/div[1]").text, "Ementa:")
+                
+                if pdf_ementa and collected_ementa:
+                    pdf_words = set(pdf_ementa.lower().split())
+                    collected_words = set(collected_ementa.lower().split())
+                    matching_words = pdf_words.intersection(collected_words)
+                    similarity_score = len(matching_words) / max(len(pdf_words), len(collected_words))
+                    ementa_match = similarity_score > 0.5
+                else:
+                    ementa_match = False
+
+                print(f"\nProcesso {i}:")
+                print(f"Header do PDF:")
+                print(pdf_header if pdf_header else "Não encontrado")
+                print(f"\nEmenta do PDF:")
+                print(pdf_ementa if pdf_ementa else "Não encontrada")
+                print(f"\nEmenta coletada:")
+                print(collected_ementa)
+                print(f"\nTextos correspondem: {ementa_match}")
+                print("-" * 80)
+
                 pdf_patterns_ativo = main_pdf_extract.extract_patterns_from_pdf(
                     "processo_temp.pdf", 1, {
                         "APELANTE": r'APELANTE:\s*(.+)',
@@ -85,7 +106,6 @@ def extract_case_data(driver):
                     }
                 ) or {}
 
-                # Padrões para parte passiva
                 pdf_patterns_passivo = main_pdf_extract.extract_patterns_from_pdf(
                     "processo_temp.pdf", 1, {
                         "APELADO": r'APELADO:\s*(.+)',
@@ -95,7 +115,6 @@ def extract_case_data(driver):
                     }
                 ) or {}
 
-                # Extrai nome e tipo para parte ativa
                 nome_parte_ativa = None
                 tipo_parte_ativa = None
                 for key, value in pdf_patterns_ativo.items():
@@ -104,7 +123,6 @@ def extract_case_data(driver):
                         tipo_parte_ativa = key
                         break
 
-                # Extrai nome e tipo para parte passiva
                 nome_parte_passiva = None
                 tipo_parte_passiva = None
                 for key, value in pdf_patterns_passivo.items():
@@ -238,15 +256,26 @@ def extract_case_data(driver):
                         "instancia": None,
                         "ementa": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[8]/td/div[1]").text,
                             "Ementa:"
-                        )
+                        ),                                                                        
                     }
                 ]
             }
-        ]
+        ],
+        "ementa_match": ementa_match,
+        "pdf_header": pdf_header
     }
+
+                case_data.update({
+                    "ementa_match": ementa_match,
+                    "pdf_header": pdf_header,
+                    "similarity_score": similarity_score if ementa_match else 0
+                })
 
                 results.append(case_data)
                 print(f"Processo {i} coletado com sucesso.")
+                print(f"Ementa match: {ementa_match}")
+                print(f"PDF Header: {pdf_header}")
+                print(f"Collected Ementa: {collected_ementa}")
             except Exception as e:
                 print(f"Erro ao coletar dados da linha {i}: {e}")
         return results
