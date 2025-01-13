@@ -89,20 +89,12 @@ def download_pdf(cdacordao):
                 f.write(response.content)
             print(f"PDF {cdacordao} baixado com sucesso.")
 
-            # Extrair informações da primeira página
             first_page_text = extract_text_from_pdf(output_file, 0)
             if first_page_text:
                 print(f"Text from first page of {output_file}:")
                 print(first_page_text)
 
-            # Extrair header e ementa da segunda página
-            header, ementa = extract_header_and_ementa_from_pdf(output_file, 1)
-            if header:
-                print(f"Header from second page of {output_file}:")
-                print(header)
-            if ementa:
-                print(f"Ementa from second page of {output_file}:")
-                print(ementa)
+
         else:
             print(f"Erro ao baixar o PDF para {cdacordao}. Status: {response.status_code}")
     except Exception as e:
@@ -129,32 +121,14 @@ def extract_case_data(driver):
                     cdacordao = link.get_attribute("cdacordao")
                     if cdacordao:
                         download_pdf(cdacordao)
-
-                pdf_header, pdf_ementa = extract_header_and_ementa_from_pdf("processo_temp.pdf", 1)
-
-                collected_ementa = remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[8]/td/div[1]").text, "Ementa:")
-                
-                if pdf_ementa and collected_ementa:
-                    pdf_words = set(pdf_ementa.lower().split())
-                    collected_words = set(collected_ementa.lower().split())
-                    matching_words = pdf_words.intersection(collected_words)
-                    similarity_score = len(matching_words) / max(len(pdf_words), len(collected_words))
-                    ementa_match = similarity_score > 0.5
-                else:
-                    ementa_match = False
+             
 
                 print(f"\nProcesso {i}:")
-                print(f"Header do PDF:")
-                print(pdf_header if pdf_header else "Não encontrado")
-                print(f"\nEmenta do PDF:")
-                print(pdf_ementa if pdf_ementa else "Não encontrada")
-                print(f"\nEmenta coletada:")
-                print(collected_ementa)
-                print(f"\nTextos correspondem: {ementa_match}")
+                print(f"Header do PDF:")                
                 print("-" * 80)
 
                 pdf_patterns_ativo = extract_patterns_from_pdf(
-                    "processo_temp.pdf", 1, {
+                    "processo_temp.pdf", 0, {
                         "APELANTE": r'APELANTE:\s*(.+)',
                         "AGRAVANTE": r'AGRAVANTE:\s*(.+)',
                         "EMBARGANTE": r'EMBARGANTE:\s*(.+)',
@@ -163,7 +137,7 @@ def extract_case_data(driver):
                 ) or {}
 
                 pdf_patterns_passivo = extract_patterns_from_pdf(
-                    "processo_temp.pdf", 1, {
+                    "processo_temp.pdf", 0, {
                         "APELADO": r'APELADO:\s*(.+)',
                         "AGRAVADO": r'AGRAVADO:\s*(.+)',
                         "EMBARGADO": r'EMBARGADO:\s*(.+)',
@@ -310,26 +284,15 @@ def extract_case_data(driver):
                         "usuarioJuntada": None,
                         "usuarioCriador": None,
                         "instancia": None,
-                        "ementa": collected_ementa,
                     }
                 ]
             }
         ],
-        "ementa_match": ementa_match,
-        "pdf_header": pdf_header
     }
 
-                case_data.update({
-                    "ementa_match": ementa_match,
-                    "pdf_header": pdf_header,
-                    "similarity_score": similarity_score if ementa_match else 0
-                })
 
                 results.append(case_data)
                 print(f"Processo {i} coletado com sucesso.")
-                print(f"Ementa match: {ementa_match}")
-                print(f"PDF Header: {pdf_header}")
-                print(f"Collected Ementa: {collected_ementa}")
             except Exception as e:
                 print(f"Erro ao coletar dados da linha {i}: {e}")
         return results
