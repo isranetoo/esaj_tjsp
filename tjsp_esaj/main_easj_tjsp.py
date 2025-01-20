@@ -147,51 +147,48 @@ def extract_case_data(driver):
                 ) or {}
 
                 nome_parte_ativa = None
-                tipo_parte_ativa = None
                 for key, value in pdf_patterns_ativo.items():
                     if value:
                         nome_parte_ativa = value.strip()
-                        tipo_parte_ativa = key
                         break
 
                 nome_parte_passiva = None
-                tipo_parte_passiva = None
                 for key, value in pdf_patterns_passivo.items():
                     if value:
                         nome_parte_passiva = value.strip()
-                        tipo_parte_passiva = key
                         break
 
-                case_data = {                             
+                case_data = {
                     "numero":  row.find_element(By.XPATH, f"td[2]/table/tbody/tr[1]/td/a[1]").text,
-                    "valorDaCausa": None,
                     "area_code": None,
                     "tribunal_code": None,
                     "vara_code": None,
-                    "area": None,
+                    "ano": None,
+                    "area": "Trabalhista",
                     "tribunal": "TJ-SP",
                     "comarca": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[4]/td").text, "Comarca: "),
-                    "instancias": [{
-                        "fonte_script": "Scrapper",
-                        "fonte_sistema": "TJ-SP",
-                        "fonte_tipo": "TRIBUNAL",
-                        "fonte_url": "https://esaj.tjsp.jus.br/",
-
-                        "grau": None,
-                        "classe": None,
-                        "orgaoJulgador": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[5]/td").text, "Órgão julgador: "),
-                        "segredoJustica": None,
-                        "justicaGratuita": None,
-                        "assunto_principal": None,
-                        "assuntos": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[2]/td").text, "Classe/Assunto: "),
-                        "first_mov": None,
-                        "last_mov": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text, "Data de publicação: "),
+                    "valor_da_causa": None,
+                    "fontes": [{
+                        "provider": "Interno",
+                        "script": "Scrapper",
+                        "sistema": "TJ-SP",
+                        "tipo": "TRIBUNAL",
+                        "instancias": [{
+                            "url": "https://esaj.tjsp.jus.br/",
+                            "grau": None,
+                            "classe": None,
+                            "orgaoJulgador": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[5]/td").text, "Órgão julgador: "),
+                            "justica_gratuita": None,
+                            "assunto_principal": None,
+                            "assuntos": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[2]/td").text, "Classe/Assunto: "),
                         "envolvidos": [
                             {
                                 "nome": nome_parte_ativa,
-                                "tipo": tipo_parte_ativa if tipo_parte_ativa else "RECLAMANTE",
+                                "tipo": "RECLAMANTE",
                                 "polo": "ATIVO",
-                                "id_sistema": {"login": None},
+                                "id_sistema": {
+                                    "login": None
+                                },
                                 "documento": [],
                                 "endereco": {},
                                 "representantes": [
@@ -199,8 +196,14 @@ def extract_case_data(driver):
                                         "nome": None,
                                         "tipo": "ADVOGADO",
                                         "polo": "ATIVO",
-                                        "id_sistema": {"login": None},
-                                        "documento": [{"CPF": None}],
+                                        "id_sistema": {
+                                            "login": None
+                                        },
+                                        "documento": [
+                                            {
+                                                "CPF": None
+                                            }
+                                        ],
                                         "endereco": {
                                             "logradouro": None,
                                             "numero": None,
@@ -208,16 +211,18 @@ def extract_case_data(driver):
                                             "bairro": None,
                                             "municipio": None,
                                             "estado": None,
-                                            "cep": None,
+                                            "cep": None
                                         }
                                     }
                                 ]
                             },
                             {
                                 "nome": nome_parte_passiva,
-                                "tipo": tipo_parte_passiva if tipo_parte_passiva else "RECLAMADO",
+                                "tipo": "RECLAMADO",
                                 "polo": "PASSIVO",
-                                "id_sistema": {"login": None},
+                                "id_sistema": {
+                                    "login": None
+                                },
                                 "documento": [],
                                 "endereco": {},
                                 "representantes": [
@@ -225,8 +230,14 @@ def extract_case_data(driver):
                                         "nome": None,
                                         "tipo": "ADVOGADO",
                                         "polo": "PASSIVO",
-                                        "id_sistema": {"login": None},
-                                        "documento": [{"CPF": None}],
+                                        "id_sistema": {
+                                            "login": None
+                                        },
+                                        "documento": [
+                                            {
+                                                "CPF": None
+                                            }
+                                        ],
                                         "endereco": {
                                             "logradouro": None,
                                             "numero": None,
@@ -243,53 +254,43 @@ def extract_case_data(driver):
                                 "nome": remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[3]/td").text, "Relator(a): "),
                                 "tipo": "RELATOR(A)",
                                 "polo": "OUTROS",
-                                "id_sistema": {"login": None},
+                                "id_sistema": {
+                                    "login": None
+                                },
                                 "documento": [],
                                 "endereco": {},
                                 "representantes": []
                             }
                         ],
                         "movimentacoes": [
-                    {
-                        "titulo": "Data de publicação",
-                        "tipoConteudo": "HTML",
-                        "data":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,
-                          "Data de publicação: "              
-                        ),
-                        "ativo": None,
-                        "documento":None,
-                        "mostrarHeaderData": None,
-                        "usuarioCriador": None
-                    },
-                    {
-                        "titulo": None,
-                        "tipoConteudo": None,
-                        "data": None,
-                        "ativo": None,
-                        "documento": None,
-                        "usuarioCriador": None
-                    },
-                    {
-                        "id": None,
-                        "idUnicoDocumento": None,
-                        "titulo": "Ata da Audieancia",
-                        "tipo": "Ata da Audieancia",
-                        "tipoConteudo": "PDF",
-                        "data":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,
-                          "Data de publicação: "              
-                        ),
-                        "ativo": None,
-                        "documentoSigiloso": None,
-                        "usuarioPerito": None,
-                        "publico": None,
-                        "usuarioJuntada": None,
-                        "usuarioCriador": None,
-                        "instancia": None,
-                    }
-                ]
-            }
-        ],
-    }
+                            {
+                                "data":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,"Data de publicação: "),
+                                "titulo": "Publicado(a) o(a) intimação em 19/11/2024",
+                                "tipo": None,
+                                "conteudo": "HTML",
+                                "tem_documento": False,
+                                "id_documento": None
+                            },
+                            {
+                                "data":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,"Data de publicação: "),
+                                "titulo": "Juntada a petição de Manifestação",
+                                "tipo": None,
+                                "conteudo": "HTML",
+                                "tem_documento": False,
+                                "id_documento": None
+                            },
+                            {
+                                "data":  remove_prefix(row.find_element(By.XPATH, f"td[2]/table/tbody/tr[7]/td").text,"Data de publicação: "),
+                                "titulo": "Ata da Audiência",
+                                "tipo": "Ata da Audiência",
+                                "conteudo": "PDF",
+                                "tem_documento": True,
+                                "id_documento": None
+                            }
+                        ]
+                        }]
+                    }]
+                }
 
 
                 results.append(case_data)
@@ -302,25 +303,6 @@ def extract_case_data(driver):
         print(f"Erro ao coletar dados da tabela: {e}")
         return []
 
-def save_session_data(driver):
-    try:
-        cookies = driver.get_cookies()
-        with open("session_cookies.json", "w") as file:
-            json.dump(cookies, file)
-    except Exception as e:
-        print(f"Erro ao salvar cookies da sessão: {str(e)}")
-
-def load_session_data(driver):
-    try:
-        if os.path.exists("session_cookies.json"):
-            with open("session_cookies.json", "r") as file:
-                cookies = json.load(file)
-            for cookie in cookies:
-                driver.add_cookie(cookie)
-            return True
-    except Exception as e:
-        print(f"Erro ao carregar cookies da sessão: {str(e)}")
-    return False
 
 if __name__ == "__main__":
     chrome_options = Options()
@@ -332,11 +314,8 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(options=chrome_options)
 
     try:
-        session_loaded = load_session_data(driver)
-
-        if not session_loaded:
-            print("A sessão não foi carregada. Coletando dados de processos.")
-            driver.get("https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do")
+        print("A sessão não foi carregada. Coletando dados de processos.")
+        driver.get("https://esaj.tjsp.jus.br/cjsg/resultadoCompleta.do")
 
         all_case_data = []
         base_url = "https://esaj.tjsp.jus.br/cjsg/trocaDePagina.do?tipoDeDecisao=A&pagina={}&conversationId="
@@ -358,7 +337,6 @@ if __name__ == "__main__":
             with open("processos.json", "w", encoding="utf-8") as file:
                 json.dump(all_case_data, file, ensure_ascii=False, indent=4)
             print("Dados de todos os processos salvos no arquivo 'processos.json'.")
-            save_session_data(driver)
         except Exception as e:
             print(f"Erro ao salvar dados: {str(e)}")
 
